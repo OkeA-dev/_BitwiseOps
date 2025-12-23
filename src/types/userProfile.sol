@@ -77,4 +77,48 @@ library UserProfileLibrary {
             result := shr(and(self, FLAGS_MASK), 72)
         }
     }
+
+     function hasFlag(
+        UserProfile self,
+        uint8 flagPosition
+    ) internal pure returns (bool isSet) {
+        require(flagPosition < 8, "Flag position out of range");
+        
+        assembly {
+            // Extract flags byte and check specific bit
+            let flagsByte := and(shr(72, self), 0xFF)
+            isSet := and(shr(flagPosition, flagsByte), 1)
+        }
+    }
+
+    function setFlag(
+        UserProfile self,
+        uint8 flagPosition,
+        bool value
+    ) internal pure returns (UserProfile result) {
+        require(flagPosition < 8, "Flag position out of range");
+        
+        assembly {
+            // Extract current flags
+            let currentFlags := and(shr(72, self), 0xFF)
+            
+            // Create bit mask for the position
+            let bitMask := shl(flagPosition, 1)
+            
+            let newFlags
+            switch value
+            case true {
+                // Set bit: OR with mask
+                newFlags := or(currentFlags, bitMask)
+            }
+            default {
+                // Clear bit: AND with inverted mask
+                newFlags := and(currentFlags, not(bitMask))
+            }
+            
+            // Clear old flags and set new ones
+            let cleared := and(self, not(FLAGS_MASK))
+            result := or(cleared, shl(72, newFlags))
+        }
+    }
 }
