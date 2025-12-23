@@ -62,19 +62,19 @@ library UserProfileLibrary {
     //    - accountAge
     function accountAge(UserProfile self) internal pure returns (uint256 result) {
         assembly {
-            result := shr(and(self, ACOUNTAGE_MASK), 32)
+            result := and(shr(32, self), 0xFFFF)
         }
     }
     //    - reputationScore
     function reputationScore(UserProfile self) internal pure returns (uint256 result) {
         assembly {
-            result := shr(and(self, REPUTATIONSCORE_MASK), 48)
+            result := and(shr(48, self), 0xFFFFFF)
     }
     }
     //    - flags   
     function flags(UserProfile self) internal pure returns (uint256 result) {
         assembly {
-            result := shr(and(self, FLAGS_MASK), 72)
+            result := and(shr(72, self), 0xFF)
         }
     }
 
